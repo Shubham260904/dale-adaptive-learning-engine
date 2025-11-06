@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Domain {
+  ARRAY
+  STRING
+  BIT_MANIPULATION
+  LINKED_LIST
+  STACK_QUEUE
+  BINARY_SEARCH
+  BST
+  GRAPH
+  UNION_FIND
+  RECURSION
+  DYNAMIC_PROGRAMMING
+  OOPS
+  OS
+  DBMS
+  HR
+  SYS_DESIGN
+}
+
+
+model User {
+  id           String   @id @default(uuid())
+  name         String?
+  email        String   @unique
+  createdAt    DateTime @default(now())
+  submissions  Submission[]
+  histories    RatingHistory[]
+  domainRatings DomainRating[]
+}
+
+model DomainRating {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  domain    Domain
+  rating    Int      @default(1200)
+  updatedAt DateTime @updatedAt
+}
+
+
+model Question {
+  id              String   @id @default(uuid())
+  domain          Domain
+  title           String
+  statement       String
+  input_format    String?
+  output_format   String?
+  constraints     String?
+  difficulty      Int
+  editorial       String?
+  core_idea_hint  String?
+  test_edge_cases String?
+  createdAt       DateTime @default(now())
+  submissions     Submission[]
+}
+
+model Submission {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String
+  code        String?
+  answerText  String?
+  verdict     String
+  createdAt   DateTime @default(now())
+}
+
+model RatingHistory {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  domain      Domain
+  old_rating  Int
+  new_rating  Int
+  delta       Int
+  createdAt   DateTime @default(now())
+}
